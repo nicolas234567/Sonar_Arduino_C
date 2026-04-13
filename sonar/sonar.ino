@@ -10,6 +10,13 @@
 
 Servo servo;
 
+//definition globale
+int angle = 0;
+int direction = 1;
+long distance;
+unsigned long previousMillis = 0;
+const int interval = 50;
+
 void setup() {
   // put your setup code here, to run once:
   servo.attach(9); // on définit le Pin utilisé par le servomoteur
@@ -22,27 +29,24 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  long distance;
+  unsigned long currentMillis = millis();
 
-  servo.write(0);
-  distance = mesurerDistance();
-  actionDistance(distance);
-  delay(500);
+  // Mouvement du servo
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
 
-  servo.write(45);
-  distance = mesurerDistance();
-  actionDistance(distance);
-  delay(500);
+    servo.write(angle);
+    angle += direction;
 
-  servo.write(90);
-  distance = mesurerDistance();
-  actionDistance(distance);
-  delay(500);
+    // changement de sens
+    if (angle >= 90 || angle <= 0) {
+      direction *= -1; 
+    }
+  }
 
-  servo.write(45);
-  distance = mesurerDistance();
+  //mesure et gestion des led
+  long distance = mesurerDistance();
   actionDistance(distance);
-  delay(500);
 }
 
 long mesurerDistance() {
@@ -53,20 +57,26 @@ long mesurerDistance() {
   digitalWrite(PIN_TRIG, LOW);
 
   long duree = pulseIn(PIN_ECHO, HIGH);
-  if (duree == 0) return; 
+  if (duree == 0) return -1; 
 
   return duree / 58; //conversion en centimetre
 }
 
 void actionDistance(long distance) {
+  //erreur si distance invalide
+  if(distance == -1){
+    Serial.println("Erreur mesure");
+    return;
+  }
+
+  //gestion des led
   if(distance < LIMITE_DETECTION){
     digitalWrite(PIN_LED_VERTE, LOW);
     digitalWrite(PIN_LED_ROUGE, HIGH);
-    delay(500);
-    digitalWrite(PIN_LED_ROUGE, LOW);
   }
   else{
     digitalWrite(PIN_LED_VERTE, HIGH);
+    digitalWrite(PIN_LED_ROUGE, LOW);
   }
 
 }
