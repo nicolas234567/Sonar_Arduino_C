@@ -31,14 +31,14 @@ Le système effectue un balayage et détecte les objets dans son champ. Selon la
 ##  Schéma de câblage
 
 
-![Schéma](images/schema.png)
+![schema](docs/schema.png)
 
 ---
 
 ## Démonstration
 
 
-![Demo](videos/demo.mp4)
+![demo](docs/demo.gif)
 
 ---
 
